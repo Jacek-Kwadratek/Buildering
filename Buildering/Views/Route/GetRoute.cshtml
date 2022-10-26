@@ -1,0 +1,249 @@
+﻿@model Buildering.Data.Models.Domain.Route
+
+@{
+    ViewBag.Title = "GetRoute";
+}
+<head>
+    @*Including leaflet.js CSS file and Javascript file*@
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+          integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+          crossorigin="" />
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+            integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+            crossorigin="">
+    </script>
+
+    <style>
+        #mapid {
+            height: 300px;
+            position: relative;
+        }
+
+        @*@media used with display: block to show buttons only on mobile and display: none when not *@
+        @@media only screen and (max-width: 768px) {
+            button#goToGPS {
+                position: absolute;
+                z-index: 500;
+                bottom: 30px;
+                right: 20px;
+                background: transparent;
+                border: none !important;
+                display: block;
+            }
+
+            i.fa-compass {
+                z-index: 400;
+                position: absolute;
+                font-size: x-large;
+                color: red;
+                display: block;
+            }
+
+            button#goToCurrentRoute {
+                position: absolute;
+                z-index: 500;
+                top: 10px;
+                right: 15px;
+                background: transparent;
+                border: none !important;
+                display: block;
+            }
+
+            i.fa-map-marker-alt {
+                z-index: 400;
+                position: absolute;
+                font-size: x-large;
+                color: red;
+                display: block;
+            }
+        }
+
+        #goToGPS{
+            display: none;
+        }
+
+        .fa-compass{
+            display: none;
+        }
+
+        #goToCurrentRoute{
+            display: none;
+        }
+
+        .fa-map-marker-alt{
+            display: none;
+        }
+    </style>
+</head>
+
+@*mapid div is container for the map created using leaflet.js it must be declared before leaflet.js code populates it*@
+
+<div id="mapid">
+    <button onclick="goToCurrentRoute()" id="goToCurrentRoute">
+        <i class="fas fa-map-marker-alt"></i>
+    </button>
+    <button onclick="goToCurrentGPS()" id="goToGPS">
+        <i class="far fa-compass"></i>
+    </button>
+</div>
+
+
+<script>
+
+    //Location for map start and marker taken from model coordinates
+    var suppliedLoc = '@Model.Coordinate';
+    var coords = suppliedLoc.split(",");
+
+    //Specifying map parameters: initial location, where to source the background map, level of zoom allowed
+    var map = L.map('mapid', { attributionControl: false }).setView([coords[0], coords[1]], 19);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 20,
+            maxNativeZoom: 19,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+    L.control.attribution({ position: 'bottomleft' }).addTo(map);
+    var marker = L.marker([coords[0], coords[1]]).addTo(map);
+
+    //GPS functionality, shows user on map when GPS enabled. userLocation must be specified first,
+    //it is then altered every time location is found and removes the previous userLocation circle.
+    var userLocation = L.circle([48.526, 123.236]).addTo(map);
+    function onLocationFound(e) {
+        var radius = e.accuracy / 2;
+        userLocation.remove();
+        userLocation = L.circle(e.latlng, radius, { color: 'red' }).addTo(map);
+        userLocation.addTo(map);
+    }
+    map.on('locationfound', onLocationFound);
+    map.locate({ setView: false, watch: true, enableHighAccuracy: true });
+
+    //Functions to take user to their current location or back to the route location
+    function goToCurrentGPS() {
+        map.locate({ setView: true, watch: false, enableHighAccuracy: true });
+    }
+    function goToCurrentRoute() {
+        map.flyTo([coords[0], coords[1]], 19);
+    }
+
+    //Toggle function to show or hide div containing videos
+    function ShowVideos() {
+
+        var videos = document.getElementById("videos");
+        var videoButton = document.getElementById("videoButton");
+
+        if (videos.style.display === "none") {
+            videos.style.display = "block";
+            videoButton.textContent = "Hide Videos";
+        } else {
+            videos.style.display = "none";
+            videoButton.textContent = "Show Videos";
+        }
+    }
+
+</script>
+<h2>@Model.Name</h2>
+
+<div>
+
+    <hr />
+
+    @if (ViewContext.HttpContext.User.IsInRole("Admin") || ViewContext.HttpContext.User.Identity.Name == Model.User)
+    {
+        <ul>
+            <li>@Html.ActionLink("Edit", "EditRoute", new { id = Model.ID })</li>
+            <li>@Html.ActionLink("Delete", "DeleteRoute", new { id = Model.ID })</li>
+        </ul>
+    }
+
+    <dl class="dl-horizontal">
+        <dd>
+            @if (Model.Topo != "")
+            {
+                <img src="@Url.Content("~/ImageFolder/" + Model.TopoName)" alt="File not found" height="250" width="250" />
+            }
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Description)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Description)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Rating)
+        </dt>
+
+        <dd>
+            @for (int i = 0; i < Model.Rating; i++)
+            {
+                <span class="fas fa-star" style="font-size:15px;color:yellow"></span>
+            }
+            @for (int i = Model.Rating; i < 5; i++)
+            {
+                <span class="far fa-star" style="font-size:15px;color:wheat"></span>
+            }
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.User)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.User)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Grade)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Grade)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.VotedGrade)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.VotedGrade)
+        </dd>
+        @Html.ActionLink("Vote on Grade", "VoteOnGrade", new { ID = Model.ID })
+    </dl>
+</div>
+
+<p style="text-align:right;">
+    @Html.ActionLink("Report route", "ContactAdmin")
+</p>
+<p>
+    <h2>Comments of @Model.Name </h2>
+</p>
+
+@if (Model.Comments.Count != 0)
+{
+    @Html.Partial("~/Views/Comment/GetComments.cshtml", Model.Comments);
+}
+@Html.ActionLink("Add Comment", "AddCommentToRoute", "Comment", new { routeId = Model.ID }, null)
+<p>
+    <h2>Photos of @Model.Name </h2>
+</p>
+@if (Model.Photos.Count != 0)
+{
+    @Html.Partial("~/Views/Photo/GetPhotos.cshtml", Model.Photos);
+}
+@Html.ActionLink("Add Photo", "AddPhotoToRoute", "Photo", new { routeId = Model.ID }, null)
+
+<p>
+    <h2>Videos of @Model.Name </h2>
+</p>
+<button onclick="ShowVideos()" id="videoButton">Show Videos</button>
+<div id="videos" style="display:none">
+    @if (Model.Videos.Count != 0)
+    {
+        @Html.Partial("~/Views/Video/GetVideos.cshtml", Model.Videos);
+    }
+    @Html.ActionLink("Add Video", "AddVideoToRoute", "Video", new { routeId = Model.ID }, null)
+</div>
+
+
+
+

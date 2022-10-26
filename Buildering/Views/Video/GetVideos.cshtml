@@ -1,0 +1,29 @@
+﻿@model IEnumerable<BuilderingApp.Models.Video>
+
+@{
+    ViewBag.Title = "GetVideos";
+}
+
+
+
+
+<table class="table">
+    
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            <iframe width="200" height="200" src="//www.youtube.com/embed/@item.URL" frameborder="0" allowfullscreen></iframe>
+
+        </td>
+
+        @if (ViewContext.HttpContext.User.IsInRole("Admin") || ViewContext.HttpContext.User.Identity.Name == item.User)
+        {
+            <td>
+                @Html.ActionLink("Delete", "DeleteVideo", "Video", new { id = item.VideoId }, null)
+            </td>
+        }
+
+    </tr>
+}
+
+</table>

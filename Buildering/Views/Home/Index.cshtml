@@ -1,0 +1,149 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+<head>
+    @*Including leaflet.js CSS file and Javascript file*@
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+          integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+          crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+            integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+            crossorigin=""></script>
+    <style>
+        html,
+        body {
+            margin: 0px;
+            height: 100%
+        }
+
+        #mapid {
+            position: absolute;
+            top: 45px;
+            right: 0px;
+            bottom: 0px;
+            left: 0px;
+            z-index: 1;
+        }
+
+        #searchBox {
+            z-index: 3;
+            position: absolute;
+            top: 60px;
+            right: 40px;
+            display: none;
+        }
+
+        .fa-search {
+            z-index: 2;
+            position: absolute;
+            top: 60px;
+            right: 15px;
+            font-size: x-large;
+        }
+
+        @*@media used with display: block to show buttons only on mobile and display: none when not *@
+        @@media only screen and (max-width: 768px) {
+            i.fa-compass {
+                z-index: 2;
+                position: absolute;
+                bottom: 15px;
+                right: 15px;
+                font-size: x-large;
+                color: red;
+                display: block;
+            }
+        }
+        .fa-compass{
+            display: none;
+        }
+
+    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+</head>
+
+
+@using (Html.BeginForm("GetRoutes", "Route", FormMethod.Get))
+{
+    <div id="searchBox">
+        <p>
+            @Html.DropDownList("Grading",
+          new SelectList(Enum.GetValues(typeof(Buildering.Data.Models.Domain.Route.Grades))),
+          "Select Grade",
+          new { @class = "form-control" })
+            @Html.TextBox("searchstring", "", new { placeholder = "Route name" })<br />
+            <input type="submit" value="Search" />
+        </p>
+    </div>
+}
+
+@*mapid div is container for the map created using leaflet.js it must be declared before leaflet.js code populates it*@
+<div id="mapid"></div>
+
+<button onclick="ShowSearchBox()"><i class='fas fa-search'></i></button>
+<button onclick="goToCurrentGPS()" id="goToGPS"><i class="far fa-compass"></i></button>
+
+<script>
+    //Toggle function to show or hide search box
+    function ShowSearchBox() {
+
+        var searchBox = document.getElementById("searchBox");
+
+        if (searchBox.style.display === "none") {
+            searchBox.style.display = "block";
+        } else {
+            searchBox.style.display = "none";
+        }
+    }
+
+    //Function to take user to current location
+    function goToCurrentGPS() {
+        map.locate({ setView: true, watch: false, enableHighAccuracy: true });
+    }
+
+    //Specifying map parameters: initial location, where to source the background map, level of zoom allowed
+    var map = L.map('mapid', {attributionControl: false }).setView([53.3811, -1.4701], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+		attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+    L.control.attribution({position: 'bottomleft'}).addTo(map);
+
+    //GPS functionality, shows user on map when GPS enabled. userLocation must be specified first,
+    //it is then altered every time location is found and removes the previous userLocation circle.
+    var userLocation = L.circle([48.526, 123.236]).addTo(map);
+    function onLocationFound(e) {
+        var radius = e.accuracy / 2;
+        userLocation.remove();
+        userLocation = L.circle(e.latlng, radius, {color: 'red'}).addTo(map);
+        userLocation.addTo(map);
+    }
+    map.on('locationfound', onLocationFound);
+    map.locate({ setView: false, watch: true, enableHighAccuracy: true});
+
+
+    //Right click or mobile long press functionality. Popup must be declared first, it then appears on the map
+    // and is populated with data from a contextmenu(right click or longpress) click using click location.
+    var popup = L.popup();
+    function onMapClick(e)
+        {
+        var link = '@Html.ActionLink("Add Route", "AddRoute", "Route", new { Coordinate = 0 }, null)';
+        var coords = e.latlng.lat + ',' + e.latlng.lng;
+        link = link.replace(0, coords);
+        popup
+            .setLatLng(e.latlng)
+            .setContent(link)
+            .openOn(map);
+    }
+    map.on('contextmenu', onMapClick);
+
+    //Loop populating map with markers with links to routes from the route database
+     @foreach(var route in ViewBag.Routes)
+      {
+         <text>
+            var link = '@Html.ActionLink((string)route.Name, "GetRoute", new {id = route.ID, Controller = "Route"})';
+            var marker = L.marker([@route.Coordinate]).addTo(map);
+            marker.bindPopup(link + ' ' + '@route.Grade');
+        </text>
+      }
+</script>

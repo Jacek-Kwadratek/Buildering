@@ -1,0 +1,13 @@
+﻿@{
+    ViewBag.Title = "GetRolesForUserConfirmed";
+}
+<h2>Roles for this User</h2>
+<div>
+    <ol>
+        @foreach (string role in ViewBag.userRoles)
+        {
+            <li>@role</li>
+        }
+    </ol>
+</div>
+@Html.ActionLink("Back", "GetRolesForUser")

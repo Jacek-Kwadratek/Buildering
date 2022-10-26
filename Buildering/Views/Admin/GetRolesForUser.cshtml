@@ -1,0 +1,19 @@
+﻿
+@{
+    ViewBag.Title = "GetRolesForUser";
+}
+
+<h2>GetRolesForUser</h2>
+
+@using (Html.BeginForm("GetRolesForUser", "Admin"))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+    <p>
+        User UserName: @Html.DropDownList("UserName",
+(IEnumerable<SelectListItem>)ViewBag.Users)
+    </p>
+    <input type="submit" value="Get" />
+}
+<br />
+@Html.ActionLink("Back to Admin Options", "Index") 

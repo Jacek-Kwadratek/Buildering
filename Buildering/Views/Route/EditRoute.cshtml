@@ -1,0 +1,173 @@
+﻿@model Buildering.Data.Models.Domain.Route
+
+@{
+    ViewBag.Title = "EditRoute";
+}
+
+<h2>Edit Route</h2>
+@if (Model != null)
+{
+    <head>
+        @*Including leaflet.js CSS file and Javascript file*@
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+              integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+              crossorigin="" />
+        <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+                integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+                crossorigin=""></script>
+        <style>
+            #mapid {
+                height: 300px;
+            }
+        </style>
+    </head>
+
+    @*mapid div is container for the map created using leaflet.js it must be declared before leaflet.js code populates it*@
+    <div id="mapid"></div>
+    <script type="text/javascript">
+
+        function GrOut(rating) {
+            for (var i = 1; i <= rating; i++) {
+                $("#span" + i).attr('class', 'far fa-star')
+            }
+        }
+        function GrOver(rating) {
+            for (var i = 1; i <= rating; i++) {
+                $("#span" + i).attr('class', 'fas fa-star')
+
+            }
+        }
+        function GrClick(rating) {
+            $("#lblRating").val(rating);
+            for (var i = 1; i <= rating; i++) {
+                $("#span" + i).attr('class', 'fas fa-star');
+            }
+            for (var i = rating + 1; i <= 5; i++) {
+                $("#span" + i).attr('class', 'far fa-star');
+            }
+        }
+        function GrSelected() {
+            var rating = $("#lblRating").val();
+            for (var i = 1; i <= rating; i++) {
+                $("#span" + i).attr('class', 'fas fa-star');
+            }
+        }
+
+        //Function to set rating when page loads, using the current Route's rating
+        function SetInitialRating()
+        {
+            GrOut(@Model.Rating);
+            GrOver(@Model.Rating);
+            GrClick(@Model.Rating);
+        }
+
+        //Location for map start and marker taken from model coordinates
+        var suppliedLoc = '@Model.Coordinate';
+        var coords = suppliedLoc.split(",");
+
+        //Specifying map parameters: initial location, where to source the background map, level of zoom allowed
+        var map = L.map('mapid').setView([coords[0], coords[1]], 19);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 20,
+                maxNativeZoom: 19,
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+        var marker = L.marker([coords[0], coords[1]], { draggable: 'true' }).addTo(map);
+
+        //Marker is able to be dragged, when the drag finishes it updates the coordinates to be input
+        marker.on('dragend', function (e) {
+            coords = marker.getLatLng().lat + ',' + marker.getLatLng().lng;
+            document.getElementById("Coordinate").value = coords;
+        });
+
+        window.onload = SetInitialRating;
+
+    </script>
+
+
+
+    using (Html.BeginForm("EditRoute", "Route", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        @Html.AntiForgeryToken()
+
+        <div class="form-horizontal">
+            <h4>Route</h4>
+            <hr />
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            @Html.HiddenFor(model => model.ID)
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Description, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Topo, htmlAttributes: new { @class = "control-label col-md-2" })
+
+                <div class="col-md-10">
+                    <input type="file" value="Upload" name="Topo" required />
+                </div>
+            </div>
+
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Rating, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    <div onmouseout="GrSelected()">
+                        <span id="span1" onmouseout="GrOut(1)" onmouseover="GrOver(1)" onclick="GrClick(1)" class="far fa-star" style="font-size:15px;color:yellow"></span>
+                        <span id="span2" onmouseout="GrOut(2)" onmouseover="GrOver(2)" onclick="GrClick(2)" class="far fa-star" style="font-size:15px;color:yellow"></span>
+                        <span id="span3" onmouseout="GrOut(3)" onmouseover="GrOver(3)" onclick="GrClick(3)" class="far fa-star" style="font-size:15px;color:yellow"></span>
+                        <span id="span4" onmouseout="GrOut(4)" onmouseover="GrOver(4)" onclick="GrClick(4)" class="far fa-star" style="font-size:15px;color:yellow"></span>
+                        <span id="span5" onmouseout="GrOut(5)" onmouseover="GrOver(5)" onclick="GrClick(5)" class="far fa-star" style="font-size:15px;color:yellow"></span>
+                    </div>
+                    <div>
+                        <input type="hidden" name="Rating" id="lblRating" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Grade, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.DropDownListFor(Model => Model.Grade,
+                     new SelectList(Enum.GetValues(typeof(Buildering.Data.Models.Domain.Route.Grades))),
+                     "Select Grade")
+                    @Html.ValidationMessageFor(model => model.Grade, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <input class="form-control text-box single-line valid" id="Coordinate" name="Coordinate" type="hidden" value="@Model.Coordinate" aria-invalid="false">
+            <input class="form-control text-box single-line valid" id="User" name="User" type="hidden" value="@Model.User" aria-invalid="false">
+
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" value="Save" class="btn btn-default" />
+                </div>
+            </div>
+        </div>
+    }
+}
+
+@if (Model == null)
+{
+    <div>
+        @ViewBag.errorMsg
+        @Html.ActionLink("Return to route", "GetRoute", "Route", new { id = ViewBag.ID }, null)
+    </div>
+}
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

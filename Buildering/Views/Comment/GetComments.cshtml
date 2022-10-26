@@ -1,0 +1,35 @@
+﻿@model IEnumerable<BuilderingApp.Models.Comment>
+
+@{
+    ViewBag.Title = "GetComments";
+}
+
+
+
+
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Content)
+        </th>
+        
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+<tr>
+    <td>
+        @Html.DisplayFor(modelItem => item.Content)
+
+        @if (ViewContext.HttpContext.User.IsInRole("Admin") || ViewContext.HttpContext.User.Identity.Name == item.User)
+        {
+            <td>
+                @Html.ActionLink("Edit", "EditComment", "Comment", new { id = item.CommentId }, null) |
+                @Html.ActionLink("Delete", "DeleteComment", "Comment", new { id = item.CommentId }, null)
+            </td>
+          }
+    
+    </tr>
+        }
+
+        </table>

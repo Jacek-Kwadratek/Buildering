@@ -1,0 +1,39 @@
+﻿@{
+    ViewBag.Title = "ContactAdmin";
+}
+
+<h2>Contact Admin</h2>
+<form method="post" action="ContactAdmin">
+    <div class="container">
+
+        <div style="display: none;">
+            <div class="form-group" , readonly="readonly">
+                <input type="text" name="returnUrl" value=@ViewData["URL"] class="form-control" placeholder="Your Name *" id="returnUrl">
+                <p class="help-block text-danger"></p>
+            </div>
+        </div>
+
+        <input class="form-control text-box single-line valid" id="name" name="name" type="hidden" value="@System.Web.HttpContext.Current.User.Identity.Name" aria-invalid="false">
+
+        <span class="form-control-static">
+            Subject:
+        </span>
+        <div class="form-group" , readonly="readonly">
+            <input type="text" name="subject" class="form-control" placeholder="Subject *" id="subject" required data-validation-required-message="Please enter your subject.">
+            <p class="help-block text-danger"></p>
+        </div>
+
+        <span class="form-control-static">
+            Message:
+        </span>
+        <div class="form-group" , readonly="readonly">
+            <textarea class="form-control" name="message" placeholder="Your Message *" id="message" required data-validation-required-message="Please enter a message.">
+            </textarea>
+            <p class="help-block text-danger"></p>
+        </div>
+        <br />
+        <input class="btn btn-primary" type="submit" value="Send" />
+    </div>
+</form>
+
+

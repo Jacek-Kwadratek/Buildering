@@ -1,0 +1,25 @@
+﻿@model BuilderingApp.Models.Video
+
+@{
+    ViewBag.Title = "GetVideo";
+}
+
+<h2>Video</h2>
+
+<div>
+    
+    <hr />
+    <dl class="dl-horizontal">
+        
+        <dd>
+            <iframe width="50%" height="50%" src="//www.youtube.com/embed/@Model.URL" frameborder="0" allowfullscreen></iframe>
+
+        </dd>
+
+        
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Back to Route", "GetRoute", "Route", new { id = Model.RouteId }, null)
+</p>

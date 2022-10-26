@@ -1,0 +1,39 @@
+﻿@model IEnumerable<BuilderingApp.Models.Photo>
+
+@{
+    ViewBag.Title = "GetPhotos";
+}
+
+
+<table class="table">
+    <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Title)
+            </th>
+            <th></th>
+        </tr>
+
+    @foreach (var item in Model)
+    {
+<tr>
+    <td>
+        @Html.DisplayFor(modelItem => item.Title)
+    </td>
+    <td>
+        @if (item.FilePath != "")
+        {
+            <a href="/photo/getPhoto/@item.PhotoId">
+                <img src="@Url.Content("~/ImageFolder/" + @item.Name)" alt="File not found" height="100" width="100" />
+            </a>
+        }
+    </td>
+    @if (ViewContext.HttpContext.User.IsInRole("Admin") || ViewContext.HttpContext.User.Identity.Name == item.User)
+    {
+        <td>
+            @Html.ActionLink("Delete", "DeletePhoto", "Photo", new { id = item.PhotoId }, null)
+        </td>
+    }
+</tr>
+            }
+
+        </table>

@@ -1,0 +1,51 @@
+﻿@model BuilderingApp.Models.Comment
+
+@{
+    ViewBag.Title = "DeleteComment";
+}
+
+@if (Model != null)
+{
+    <h2>Delete Comment</h2>
+
+    <h3>Are you sure you want to delete this?</h3>
+    <div>
+
+        <hr />
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayNameFor(model => model.Content)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Content)
+            </dd>
+
+
+        </dl>
+
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+
+            <input class="form-control text-box single-line valid" id="commentId" name="commentId" type="hidden" value="@Model.CommentId" aria-invalid="false">
+
+            <input class="form-control text-box single-line valid" id="routeId" name="routeId" type="hidden" value="@Model.RouteId" aria-invalid="false">
+            
+            <div class="form-actions no-color">
+                <input type="submit" value="Delete" class="btn btn-default" />
+            </div>
+        }
+    </div>
+}
+@if (Model == null)
+{
+<div>
+    <br />
+    <br />
+    <br />
+    @ViewBag.errorMsg
+    @Html.ActionLink("Return to route", "GetRoute", "Route", new { id = ViewBag.ID }, null)
+</div>
+}
+

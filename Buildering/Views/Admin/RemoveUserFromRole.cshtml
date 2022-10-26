@@ -1,0 +1,22 @@
+﻿
+@{
+    ViewBag.Title = "ManageUserRoles";
+}
+
+<h2>Manage User Roles</h2>
+
+@using (Html.BeginForm("RemoveUserFromRole", "Admin"))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+    <p>
+        User UserName: @Html.DropDownList("UserName",
+(IEnumerable<SelectListItem>)ViewBag.Users)
+        Roll: @Html.DropDownList("RoleName",
+(IEnumerable<SelectListItem>)ViewBag.Roles)
+    </p>
+    <input type="submit" value="Save" />
+
+}
+<br />
+@Html.ActionLink("Check Users' Roles", "GetRolesForUser")

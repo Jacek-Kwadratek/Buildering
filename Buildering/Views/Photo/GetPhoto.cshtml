@@ -1,0 +1,32 @@
+﻿@model BuilderingApp.Models.Photo
+
+@{
+    ViewBag.Title = "GetPhoto";
+}
+
+<h2>Photo</h2>
+
+<div>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Title)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Title)
+        </dd>
+
+        <dd>
+
+            @if (Model.FilePath != "")
+            {
+                <img src="@Url.Content("~/ImageFolder/" + Model.Name)" alt="File not found" height="500" width="500" />
+            }
+        </dd>
+
+        </dl>
+</div>
+<p>
+   @Html.ActionLink("Back to Route", "GetRoute","Route", new { id = Model.RouteId }, null)
+</p>

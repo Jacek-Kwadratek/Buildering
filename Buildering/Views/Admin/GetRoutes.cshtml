@@ -1,0 +1,79 @@
+﻿@model IEnumerable<Buildering.Data.Models.Domain.Route>
+
+@{
+    ViewBag.Title = "GetRoutes";
+}
+
+<h2>GetRoutes</h2>
+
+
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Name)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Coordinate)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Description)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Topo)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Rating)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Grade)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.VotedGrade)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.User)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Name)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Coordinate)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Description)
+        </td>
+        <td>
+            @if (item.Topo != "")
+
+            {
+
+                <img src="@Url.Content("~/ImageFolder/" + item.TopoName)" alt="File not found" height="100" width="100" />
+
+            }
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Rating)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Grade)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.VotedGrade)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.User)
+        </td>
+        <td>
+            @Html.ActionLink("Details", "GetRoute", "Route", new { id = item.ID }, null) |
+            @Html.ActionLink("Edit", "EditRoute", "Route", new { id = item.ID }, null)  |
+            @Html.ActionLink("Delete", "DeleteRoute", "Route", new { id = item.ID }, null)
+        </td>
+    </tr>
+}
+
+</table>

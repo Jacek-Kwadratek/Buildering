@@ -1,0 +1,39 @@
+﻿@model Buildering.Data.Models.Domain.Route
+
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+<div class="form-horizontal">
+    <h4>Route</h4>
+    <hr />
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    @Html.HiddenFor(model => model.ID)
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.VotedGrade, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.DropDownListFor(Model => Model.VotedGrade,
+        new SelectList(Enum.GetValues(typeof(Buildering.Data.Models.Domain.Route.Grades))),
+        "Select Grade")
+            @Html.ValidationMessageFor(model => model.VotedGrade, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <input class="form-control text-box single-line valid" id="userName" name="userName" type="hidden" value="@System.Web.HttpContext.Current.User.Identity.Name" aria-invalid="false">
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="submit" value="Save" class="btn btn-default" />
+        </div>
+    </div>
+</div>
+}
+
+<div>
+    @ViewBag.errorMsg
+    @Html.ActionLink("Return to route", "GetRoute", "Route", new { id = ViewBag.ID }, null)
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

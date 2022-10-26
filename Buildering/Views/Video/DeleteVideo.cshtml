@@ -1,0 +1,54 @@
+﻿@model BuilderingApp.Models.Video
+
+@{
+    ViewBag.Title = "DeleteVideo";
+}
+
+@if (Model != null)
+{
+    <h2>Delete Video</h2>
+
+    <h3>Are you sure you want to delete this?</h3>
+    <div>
+        <h4>Video</h4>
+        <hr />
+        <dl class="dl-horizontal">
+            <dt>
+
+            </dt>
+
+            <dd>
+                <iframe width="200" height="100" src="//www.youtube.com/embed/@Model.URL" frameborder="0" allowfullscreen></iframe>
+
+            </dd>
+
+
+        </dl>
+
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+
+            @*videoId passed to controller post action*@
+            <input class="form-control text-box single-line valid" id="videoId" name="videoId" type="hidden" value="@Model.VideoId" aria-invalid="false">
+            @*videoId passed to controller post action*@
+            <input class="form-control text-box single-line valid" id="routeId" name="routeId" type="hidden" value="@Model.RouteId" aria-invalid="false">
+
+            <div class="form-actions no-color">
+                <input type="submit" value="Delete" class="btn btn-default" />
+            </div>
+        }
+    </div>
+}
+@if (Model == null)
+{
+<div>
+    <br />
+    <br />
+    <br />
+    @ViewBag.errorMsg
+    @Html.ActionLink("Return to route", "GetRoute", "Route", new { id = ViewBag.ID }, null)
+</div>
+}
+
+
